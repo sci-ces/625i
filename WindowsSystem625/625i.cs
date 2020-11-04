@@ -6,8 +6,21 @@
  *  to run without flow, comment out error 111
  *  to ship make sure line is re-enabled 
  *  may set pre-compile setting to warn of this value not being re-enabled.
- * 
+ *  
+ *  Note version 1.2.0.54 and beyond have the following updates:
+ *  precompile settings that allow control of:
+ *  TURNON_NIHARDWARE      TURNON_LOWFLOW    TURNON_TUBESEASONING
+ *  To perform debug, simply place a # before each of the TURNON_ items
+ *  
+ *  1.2.0.54 update 5 min mode tuning to 36 seconds
+ *  add log of seconds to acquire to internal log file
+ *  2 hour mode start time fix
+ *  
+ *  
+ *   
  */
+
+
 
 
 
@@ -809,7 +822,7 @@ namespace WindowsSystem625
             }
 
 
-#if NIHARDWARE
+#if TURNON_NIHARDWARE //is defined
 
             try
             {
@@ -872,8 +885,8 @@ namespace WindowsSystem625
 
             //TODO:
             //ADD THIS LABEL TO gui
-            //    NIHardwareStatus.Text = "NI Hardware Disabled";
-            //    NIHardwareStatus.BackColor = Color.Yellow;
+            //    NIHARDWAREStatus.Text = "NI Hardware Disabled";
+            //    NIHARDWAREStatus.BackColor = Color.Yellow;
 #endif
             }
             catch (Exception Ex)
@@ -1363,6 +1376,8 @@ namespace WindowsSystem625
             // test logic here
 
 
+            //bhc debug
+
             // 
             //1.  write date time to file
             //this file is checked for last known run
@@ -1372,7 +1387,7 @@ namespace WindowsSystem625
             //must be odd hour:
             //try less than 30:  27 min and 37 min (works) 
             
-            //DateTime dt = new DateTime(now.Year, now.Month, now.Day, 13, 37 ,10 );
+            //DateTime dt = new DateTime(now.Year, now.Month, now.Day, 11, 27 ,52 );
 
 
             //AcquireRequestStarted = dt;
@@ -1384,6 +1399,7 @@ namespace WindowsSystem625
 
             //int x = 5;
 
+            //bhc debug
 
 
             //DateTime dt = new DateTime(now.Year, now.Month, now.Day, 14, 52,10 );
@@ -5190,7 +5206,7 @@ namespace WindowsSystem625
                 try
                 {
 
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                     reader = new AnalogMultiChannelReader(InputVoltage.Stream);
 
 
@@ -6711,7 +6727,7 @@ namespace WindowsSystem625
 
                 try
                 {
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                     reader = new AnalogMultiChannelReader(InputCurrent.Stream);
                     InputCurrentData = reader.ReadWaveform(2);
 
@@ -6775,7 +6791,7 @@ namespace WindowsSystem625
 //        private void InterlockOpen()
 //        {
 //            DigitalSingleChannelWriter Port00writer = new DigitalSingleChannelWriter(InterlockOutput.Stream);
-//#if NIHARDWARE
+//#if TURNON_NIHARDWARE
 //            Port00writer.WriteSingleSampleSingleLine(true, false);
 
 
@@ -6794,7 +6810,7 @@ namespace WindowsSystem625
                 try
                 {
                     DigitalSingleChannelWriter Port10writer = new DigitalSingleChannelWriter(InterlockControlWatchdogOutput.Stream);
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                     Port10writer.WriteSingleSampleSingleLine(true, true);
 #endif
                 }
@@ -6809,7 +6825,7 @@ namespace WindowsSystem625
                 try
                 {
                     DigitalSingleChannelWriter Port10writer = new DigitalSingleChannelWriter(InterlockControlWatchdogOutput.Stream);
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                     Port10writer.WriteSingleSampleSingleLine(true, false);
 #endif
                 }
@@ -6836,7 +6852,7 @@ namespace WindowsSystem625
             try
             {
                 DigitalSingleChannelWriter Port00writer = new DigitalSingleChannelWriter(InterlockOutput.Stream);
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                 Port00writer.WriteSingleSampleSingleLine(true, true);
 #endif
             }
@@ -8139,7 +8155,7 @@ namespace WindowsSystem625
 
                             //ON
                             DigitalSingleChannelWriter Port30writerOut = new DigitalSingleChannelWriter(InletHeaterOutput.Stream);
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                             Port30writerOut.WriteSingleSampleSingleLine(true, true);
 #endif
                         }
@@ -8147,7 +8163,7 @@ namespace WindowsSystem625
                         {
                             //OFF
                             DigitalSingleChannelWriter Port30writerOff = new DigitalSingleChannelWriter(InletHeaterOutput.Stream);
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                             Port30writerOff.WriteSingleSampleSingleLine(true, false);
 #endif
                         }
@@ -8363,13 +8379,13 @@ namespace WindowsSystem625
                     }
 
                     //                            DigitalSingleChannelWriter Port30writerOut = new DigitalSingleChannelWriter(InletHeaterOutput.Stream);
-                    //#if NIHARDWARE
+                    //#if TURNON_NIHARDWARE
                     //                            Port30writerOut.WriteSingleSampleSingleLine(true, true);
                     //#endif
 
 
                     //                    DigitalSingleChannelWriter Port30writerOff = new DigitalSingleChannelWriter(InletHeaterOutput.Stream);
-                    //#if NIHARDWARE
+                    //#if TURNON_NIHARDWARE
                     //                    Port30writerOff.WriteSingleSampleSingleLine(true, false);
                     //#endif
 
@@ -8504,7 +8520,7 @@ namespace WindowsSystem625
 
         private void WriteOutputVoltage(double outputVoltage)
         {
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
             //this is the HVPS voltage
             int writeOk = 0;
             int counter = 0;
@@ -8545,7 +8561,7 @@ namespace WindowsSystem625
         /// <param name="outputCurrent"></param>
         private void WriteOutputCurrent(double outputCurrent)
         {
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
             //this is the HVPS current
             int writeOk = 0;
             int counter = 0;
@@ -9494,8 +9510,14 @@ namespace WindowsSystem625
 
                                         WriteAlarmToModbus(111);
                                         AcquisitionControl.SetAlarmValue(111);
+
                                         //BHC TEST for testing without pump running:  comment out line below
+                                        // or build with TURNOFF_LOWFLOW defined in properties
+                                        //bhc debug
+#if TURNON_LOWFLOW
                                         Halt("Low Flow Error.  Flow = "+FlowAvg60s.ToString("F2"));
+#endif
+                                        //bhc debug
 
 
                                     }
@@ -9529,7 +9551,11 @@ namespace WindowsSystem625
                                         WriteAlarmToModbus(211);
                                         AcquisitionControl.SetAlarmValue(211);
 
+                                        //bhc debug
+#if TURNON_LOWFLOW
                                         Halt("Low Flow Error.  Flow = " + FlowAvg60s.ToString("F2"));
+#endif
+                                        //bhc debug
                                     }
                                     else if (FlowAvg60s > Properties.Settings.Default.FlowError && FlowAvg60s < Properties.Settings.Default.FlowWarning)
                                     {
@@ -16363,12 +16389,17 @@ namespace WindowsSystem625
                                 Logger.WriteLogFile("state = 09.  Stop Sample Pump.");          // new way
                                                                                                 //Logger.WriteLogFile("c:/temp/acquisition.txt", "state = 09.");   // old way
 
-                                //add tube seasoning here
-   
-                                //temp remove for test
+                                //tube seasoning here
+
+                                //bhc debug comment out for test, or build with TURNOFF_TUBESEASONING defined
+#if TURNON_TUBESEASONING
                                 Logger.WriteLogFile("state = 9. Start Tube Seasoning.");
                                 UpdateOperationMessage("Running tube seasoning");
                                 BackgroundManager.m_oWorkerTubeSeasoning.RunWorkerAsync();
+#endif
+
+                                //bhc debug
+
 
                                 UpdateOperationMessage("Stopping sample pump");
                                 Logger.WriteLogFile("state = 09.  Stop pump. Set flow volume to zero.");
@@ -19089,6 +19120,8 @@ namespace WindowsSystem625
 
                                         Logger.WriteLogFile(   "Perform Ecal return value = " + result.ToString());
 
+
+
                                         AcquisitionControl.SaveCESSpectrumRaw("c:/Ecal_Data_Raw", "sp_data", 1);
                                         AcquisitionControl.AdjustSpectrum();
 
@@ -19300,6 +19333,9 @@ namespace WindowsSystem625
 
                                             UpdateOperationMessage("End EC1");
                                             Logger.WriteLogFile(   "End EC1, save spec Raw and Adj, calling auto analyze.");
+
+
+
 
                                             AcquisitionControl.SaveCESSpectrumRaw("c:/spectrum_data_raw", "sp_data", 1);
                                             AcquisitionControl.AdjustSpectrum();
@@ -22815,7 +22851,7 @@ Debugtag1:
 
 
 
-            double timeAdjust = 27;
+            double timeAdjust = 30;
             double timeAdjustSplit = 0;
             int alFilter = 0;
 
@@ -22860,18 +22896,18 @@ Debugtag1:
                     {
                         if (alFilter > 0 && totalEnabled == 4)
                         {
-                            timeAdjust = 27;  //was 80 for slower older code
+                            timeAdjust = 30;  //was 80 for slower older code
                             timeAdjustSplit = timeAdjust / 3.0;
                         }
 
                         else if (alFilter > 0 && totalEnabled == 3)
                         {
-                            timeAdjust = 27; //was 80 for slower older code
+                            timeAdjust = 30; //was 80 for slower older code
                             timeAdjustSplit = timeAdjust / 2.0;
                         }
                         else if (alFilter > 0 && totalEnabled == 2)
                         {
-                            timeAdjust = 27; //was 80 for slower older code
+                            timeAdjust = 30; //was 80 for slower older code
                             timeAdjustSplit = timeAdjust;
                         }
                         else if (alFilter > 0 && totalEnabled == 1)
@@ -22886,23 +22922,23 @@ Debugtag1:
                             timeAdjustSplit = 0;
                         }
                     }
-                    //five min mode 1.2.0.1
-                    else
+                    //five min mode 1.2.0.1  
+                    else   // raise from 29 to 36
                     {
                         if (alFilter > 0 && totalEnabled == 4)
                         {
-                            timeAdjust = 29;
+                            timeAdjust = 36;
                             timeAdjustSplit = timeAdjust / 3.0;
                         }
 
                         else if (alFilter > 0 && totalEnabled == 3)
                         {
-                            timeAdjust = 29;
+                            timeAdjust = 36;
                             timeAdjustSplit = timeAdjust / 2.0;
                         }
                         else if (alFilter > 0 && totalEnabled == 2)
                         {
-                            timeAdjust = 29;
+                            timeAdjust = 36;
                             timeAdjustSplit = timeAdjust;
                         }
                         else if (alFilter > 0 && totalEnabled == 1)
@@ -23235,21 +23271,23 @@ Debugtag1:
                     }
 
                     if (SampleTime != 5)
-                    {
+                    { //upddate from 27 to 29
+
+
                         if (alFilter > 0 && totalEnabled == 4)
                         {
-                            timeAdjust = 27;  //was 80 adjusted down from the slower response timing of earlier version
+                            timeAdjust = 30;  //was 80 adjusted down from the slower response timing of earlier version
                             timeAdjustSplit = timeAdjust / 3.0;
                         }
 
                         else if (alFilter > 0 && totalEnabled == 3)
                         {
-                            timeAdjust = 27;  //was 80 see above
+                            timeAdjust = 30;  //was 80 see above
                             timeAdjustSplit = timeAdjust / 2.0;
                         }
                         else if (alFilter > 0 && totalEnabled == 2)
                         {
-                            timeAdjust = 27;  //was 80 see above
+                            timeAdjust = 30;  //was 80 see above
                             timeAdjustSplit = timeAdjust;
                         }
                         else if (alFilter > 0 && totalEnabled == 1)
@@ -23264,22 +23302,24 @@ Debugtag1:
                             timeAdjustSplit = 0;
                         }
                     }
-                    else
-                    {
+                    else 
+                    { //five min mode
+
+                        //from 30 to 36
                         if (alFilter > 0 && totalEnabled == 4)
                         {
-                            timeAdjust = 30;
+                            timeAdjust = 36;
                             timeAdjustSplit = timeAdjust / 3.0;
                         }
 
                         else if (alFilter > 0 && totalEnabled == 3)
                         {
-                            timeAdjust = 30;
+                            timeAdjust = 36;
                             timeAdjustSplit = timeAdjust / 2.0;
                         }
                         else if (alFilter > 0 && totalEnabled == 2)
                         {
-                            timeAdjust = 30;
+                            timeAdjust = 36;
                             timeAdjustSplit = timeAdjust;
                         }
                         else if (alFilter > 0 && totalEnabled == 1)
@@ -24119,7 +24159,7 @@ Debugtag1:
                 try
                 {
 
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
 
                     reader = new AnalogMultiChannelReader(InputReadValue.Stream);
                     InputTubeTempData = reader.ReadWaveform(NumberOfReadsToAverage);
@@ -24233,7 +24273,7 @@ Debugtag1:
 
                 try
                 {
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
 
                     reader = new AnalogMultiChannelReader(InputReadEnclosureTemp.Stream);
                     InputEnclosureTempData = reader.ReadWaveform(NumberOfReadsToAverage);
@@ -24344,7 +24384,7 @@ Debugtag1:
 
                 try
                 {
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
 
                     reader = new AnalogMultiChannelReader(InputReadAmbientTemp.Stream);
                     InputAmbientTempData = reader.ReadWaveform(NumberOfReadsToAverage);
@@ -24462,7 +24502,7 @@ Debugtag1:
 
                 try
                 {
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
 
                     reader = new AnalogMultiChannelReader(InputReadSampleTemp.Stream);
                     InputSampleTempData = reader.ReadWaveform(NumberOfReadsToAverage);
@@ -24572,7 +24612,7 @@ Debugtag1:
             {
                 try
                 {
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                     //reader = new AnalogMultiChannelReader(AmbientPressureSensorInput.Stream);
                     readerAtmPressure = new AnalogMultiChannelReader(InputReadAtmPressure.Stream);
 
@@ -24624,7 +24664,7 @@ Debugtag1:
             try
             {
 
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                 foreach (AnalogWaveform<double> waveform in dataLocal)
                 {
                     for (int sample = 0; sample < waveform.Samples.Count; ++sample)
@@ -24729,7 +24769,7 @@ Debugtag1:
 
                 try
                 {
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
 
                     reader = new AnalogMultiChannelReader(InputReadFilamentMonitor.Stream);
                     InputFilamentMonitorData = reader.ReadWaveform(NumberOfReadsToAverage);
@@ -24845,7 +24885,7 @@ Debugtag1:
 
                 try
                 {
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
 
                     reader = new AnalogMultiChannelReader(InputReadRelativeHumidity.Stream);
                     InputRelativeHumidityData = reader.ReadWaveform(NumberOfReadsToAverage);
@@ -24935,7 +24975,7 @@ Debugtag1:
             //string outputmmHgstringValue;
             //string stringValue;
 
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
 
             do
             {
@@ -25194,7 +25234,7 @@ Debugtag1:
             {
                 try
                 {
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
 
                     if (PumpIntention == 1)
                     {
@@ -25257,7 +25297,7 @@ Debugtag1:
                 try
                 {
 
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                     //reader = new AnalogMultiChannelReader(FlowSensorInput.Stream);
                     data = readerFlowSensor.ReadWaveform(samplesPerChannel);
                     readOk = 1;
@@ -26430,7 +26470,7 @@ Debugtag1:
                 //Logger.WriteInternalLogFile("5");
                 //define the pump output
 
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
 
                 //define the interlock output
                 InterlockOutput.DOChannels.CreateChannel("Dev1/port0/line0", "doChannel0", ChannelLineGrouping.OneChannelForEachLine);
@@ -28365,7 +28405,10 @@ Debugtag1:
             {
                 try
                 {
-
+                    //this is a delay added to prevent saving spectra before cross is complete
+                    Logger.WriteLogFile("Waiting 2 seconds before saving raw spectra.");
+                    Thread.Sleep(2000);
+                    Logger.WriteLogFile("Done waiting 2 seconds before saving raw spectra.");
 
                     cMTFFPX myxrsfp = new cMTFFPX();  //create one at the beginning?
                     string fileToSave = path + "/" + Filename + "_EC_" + EC.ToString() + ".ces";
@@ -29294,7 +29337,7 @@ Debugtag1:
 
                     try
                     {
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                         reader = new AnalogMultiChannelReader(InputCurrent.Stream);
                         InputCurrentData = reader.ReadWaveform(10);
 
@@ -29497,7 +29540,7 @@ Debugtag1:
                 try
                 {
                     DigitalSingleChannelWriter Port00writer = new DigitalSingleChannelWriter(InterlockOutput.Stream);
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                     Port00writer.WriteSingleSampleSingleLine(true, true);
 #endif
                     if (f.mtbInterlockStatus.InvokeRequired)
@@ -29559,7 +29602,7 @@ Debugtag1:
                 try
                 {
                     DigitalSingleChannelWriter Port00writer = new DigitalSingleChannelWriter(InterlockOutput.Stream);
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
                     Port00writer.WriteSingleSampleSingleLine(true, false);
 #endif
 
@@ -30153,35 +30196,18 @@ End Function
                 try
                 {
                     _cMTFFPX myxrsfp = new cMTFFPX();
-                    //string pathFilename;
+                    Logger.WriteInternalLogFile("Seconds to Acquire = " + secondsToAcquire.ToString());
 
-                    //C:\Program Files\CrossRoads Scientific\XRS - FP
-
-                    //pathFilename = "C:/Program Files/CrossRoads Scientific/XRS-FP/Master" + EC.ToString() + ".tfr";
-                    //pathFilename = "C:/Xact630CALS/630DEMO/EC" + EC.ToString() + "/Master" + EC.ToString() + ".tfr";
-                    //bool ret20 = myxrsfp.AutoAnalyze;
-                    //bool val = myxrsfp.Acquire_Spectrum;
-                    //int secondsToAcq;
-                    //secondsToAcq = minutesToAcquire * 60;
                     bool value = myxrsfp.Send_Preset[secondsToAcquire];
-                    Logger.WriteLogFile("send preset result = " + value.ToString());
+                    Logger.WriteLogFile("Send preset result = " + value.ToString());
+                    Logger.WriteInternalLogFile("Send preset result = " + value.ToString());
 
                     int returnVal;
-                    //if (value == true)
-                    //{
 
                     returnVal = myxrsfp.Acquire_Start;
-                    Logger.WriteLogFile("start command issued.  retval= " + returnVal.ToString());
+                    Logger.WriteLogFile("Start command issued.  retval= " + returnVal.ToString());
+                    Logger.WriteInternalLogFile("Start command issued.  retval= " + returnVal.ToString());
 
-                    //}
-                    //else
-                    //{
-                    //    returnVal = 0;
-                    //}
-                    //if (returnVal == true)
-                    //    return PASS;
-                    //else
-                    //    return FAIL;
                     return returnVal;
                 }
                 catch (Exception Ex)
@@ -30494,6 +30520,11 @@ End Function
 
             public int GetSamplePeriod()
             {
+
+                //bhc debug this is debug only
+                //samplePeriod = 120;
+                //bhc debug this is debug only
+
                 return samplePeriod;
 
 
@@ -30732,7 +30763,11 @@ End Function
                 int samplePeriod = AcquisitionControl.GetSamplePeriod();
 
                 //for testing only BHC
-                samplePeriod = 120;
+                //debug only
+                // bhc debug
+                //samplePeriod = 120;
+                // bhc debug
+
 
                 DateTime Result;
                 if (samplePeriod == 15 || samplePeriod == 77)
@@ -30897,10 +30932,25 @@ End Function
                 }
                 else if (samplePeriod == 240)
                 {
+                    //how much time is left in the sample period from now:
+                    //when does the next %4 hour time occur from how 
+                    //update needed:
+
+                    //if( )
+                    // i.e. its 4:01 pm
+                    //the next %4 hour time is 8pm
+                    // if the hours is >0 then start
+                    //else wait....
+
+
+
                     Result = DTNow;
                     DateTime Result2;
                     DateTime Result3;
                     DateTime Result4;
+
+
+
                     if (DTNow.Hour % 4 == 0)
                     {
                         //Result = DTNow.AddHours(0.0);
@@ -31223,11 +31273,12 @@ End Function
                 DTNow = DateTime.Now;
 
                 //
-                DateTime result2, result3, result4;
+                DateTime result2, result3, result4, result5;
 
 
 
-                if (GetSamplePeriod() == 60 || GetSamplePeriod() == 120 || GetSamplePeriod() == 180 || GetSamplePeriod() == 240)
+                //180 is obsolete
+                if (GetSamplePeriod() == 60 )
                 {
                     result = DTNow.AddMinutes(GetSamplePeriod());
                     if (DTNow.Day == result.Day)
@@ -31247,6 +31298,62 @@ End Function
 
                     //result = DTNow.Date.Add(new TimeSpan(result.Hour, 0, 0));
                 }
+
+                else if (GetSamplePeriod() == 120)
+                {
+                    result = DTNow.AddMinutes(GetSamplePeriod());
+                    if (DTNow.Day == result.Day)
+                    {
+                        result2 = result;
+                        result3 = result2.AddMinutes(-1 * result.Minute);
+                        result4 = result3.AddSeconds(-1 * result3.Second);
+
+                        if ((result4.Hour % 2) != 0)
+                        {
+                            result5 = result4.AddHours(-1);
+                            return result5;
+                        }
+                        else
+                        {
+                            return result4;
+                        }
+
+                    }
+                    else
+                    {
+                        result2 = result.AddHours(-1 * result.Hour);
+                        result3 = result2.AddMinutes(-1 * result.Minute);
+                        result4 = result3.AddSeconds(-1 * result3.Second);
+                        return result4;
+                    }
+
+                    //result = DTNow.Date.Add(new TimeSpan(result.Hour, 0, 0));
+                }
+
+
+                else if (GetSamplePeriod() == 240)
+                {
+                    result = DTNow.AddMinutes(GetSamplePeriod());
+                    if (DTNow.Day == result.Day)
+                    {
+                        result2 = result;
+                        result3 = result2.AddMinutes(-1 * result.Minute);
+                        result4 = result3.AddSeconds(-1 * result3.Second);
+                        return result4;
+                    }
+                    else
+                    {
+                        result2 = result.AddHours(-1 * result.Hour);
+                        result3 = result2.AddMinutes(-1 * result.Minute);
+                        result4 = result3.AddSeconds(-1 * result3.Second);
+                        return result4;
+                    }
+
+                    //result = DTNow.Date.Add(new TimeSpan(result.Hour, 0, 0));
+
+                }
+
+
                 else if (GetSamplePeriod() == 30)
                 {
                     result = DTNow.AddMinutes(GetSamplePeriod());
@@ -31307,7 +31414,7 @@ End Function
 
 
                 }
-                else if (GetSamplePeriod() == 5 )
+                else if (GetSamplePeriod() == 5)
                 {
 
                     int sample = GetSamplePeriod();
@@ -31318,7 +31425,7 @@ End Function
 
                     if (resultDate.Minute <= 4)
                     {
-                        result = resultDate.Date.Add(new TimeSpan(resultDate.Hour, 0, 0));                    
+                        result = resultDate.Date.Add(new TimeSpan(resultDate.Hour, 0, 0));
                     }
                     else if (resultDate.Minute >= 5 && resultDate.Minute <= 9)
                     {
@@ -36390,17 +36497,8 @@ End Function
 
             if (HaltEnabled == 1)
             {
-                try
-                {
-                    AcquisitionLogic AcquisitionControl = AcquisitionLogic.Instance;
-                    AcquisitionControl.StopXrsfpAcquisition();
-                }
-                catch
-                {
-
-                }
-
-                
+                AcquisitionLogic AcquisitionControl = AcquisitionLogic.Instance;
+                AcquisitionControl.StopXrsfpAcquisition();
 
                 runState = 0;
                 if (InvokeRequired)
@@ -36885,7 +36983,7 @@ End Function
         {
             //ON
             DigitalSingleChannelWriter Port30writer = new DigitalSingleChannelWriter(InletHeaterOutput.Stream);
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
             Port30writer.WriteSingleSampleSingleLine(true, true);
 #endif
 
@@ -36897,7 +36995,7 @@ End Function
 
             //OFF
             DigitalSingleChannelWriter Port30writer = new DigitalSingleChannelWriter(InletHeaterOutput.Stream);
-#if NIHARDWARE
+#if TURNON_NIHARDWARE
             Port30writer.WriteSingleSampleSingleLine(true, false);
 #endif
 
@@ -41275,12 +41373,21 @@ End Function
         private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
 
 
-        public static string GetTimeStampStr()
+        public static string GetTimeStampStr(int includeMs)
         {
 
             DateTime timeStamp;
             timeStamp = DateTime.Now;
-            return timeStamp.ToString("MM/dd/yyyy  HH:mm:ss:ffff ");
+
+            if (includeMs == 1)
+            {
+                return timeStamp.ToString("MM/dd/yyyy  HH:mm:ss:ffff ");
+            }
+            else
+            {
+                return timeStamp.ToString("MM/dd/yyyy  HH:mm:ss ");
+
+            }
 
         }
 
@@ -41301,70 +41408,12 @@ End Function
         /// <param name="errorMessage"></param>
         public static void WriteErrorFile(string errorMessage)
         {
-            string pathFileName;
-            string strTime;
-
-
-            //roll by date
-            //DateTime now = new DateTime();
-            //now = DateTime.Now;
-            //if (now.Day > Form1.DateTimeFromStartButtonErrorLog.Day)
-            // {
-            //     Form1.DateTimeFromStartButtonErrorLog = DateTime.Now;
-            //     pathFileName = "C:\\TempErrorFile\\ErrorFile_" + Form1.DateTimeFromStartButtonErrorLog.ToString("MM_dd_yyyy__HH_mm_ss__") + Form1.fileNoForErrorLog.ToString() + ".txt";
-            //     Form1.fileNoForErrorLog = 0;
-            //}
-            //else
-            // {
-            //     pathFileName = "C:\\TempErrorFile\\ErrorFile_" + Form1.DateTimeFromStartButtonErrorLog.ToString("MM_dd_yyyy__HH_mm_ss__") + Form1.fileNoForErrorLog.ToString() + ".txt";
-            // }
-
-            //disable error file by run press -- lines below are commented out
-            //pathFileName = "C:\\temp\\ErrorFile_" + Form1.DateTimeFromStartButtonErrorLog.ToString("MM_dd_yyyy__HH_mm_ss__") + Form1.fileNoForErrorLog.ToString() + ".txt";
-
-            //long length = 0;
-
-            //try
-            //{
-            //    length = new System.IO.FileInfo(pathFileName).Length;
-            //}
-            //catch (Exception )
-            //{
-            //    //this would call this routine which is invalid
-            //    //Logger.WriteErrorFile("Ex in get length of uC file.  Ex = " + Ex.ToString());
-            //}
-            //if (length > 50000000)
-            //{
-            //    Form1.fileNoForErrorLog += 1;
-            //    pathFileName = "C:\\temp\\ErrorFile_" + Form1.DateTimeFromStartButtonErrorLog.ToString("MM_dd_yyyy__HH_mm_ss__") + Form1.fileNoForErrorLog.ToString() + ".txt";
-            //}
-
-
-            //strTime = GetTimeStampStr();
+            string strDateTime;
 
 
 
-            //try
-            //{
-            //    _readWriteLock.EnterWriteLock();
-            //    using (StreamWriter swError = new StreamWriter(pathFileName, true))
-            //    {
-            //        swError.WriteLine("{0}   {1}", strTime, errorMessage);
-            //        swError.Close();
-            //    }
-            //}
-            //catch
-            //{
-
-            //}
-            //finally
-            //{
-            //    _readWriteLock.ExitWriteLock();
-            //}
-
-
-            DataContainer.StatusDisplayErrorMessage = errorMessage;
-            Logger.WriteErrorsAndWarningsFile(errorMessage);
+            strDateTime = Logger.WriteErrorsAndWarningsFile(errorMessage);
+            DataContainer.StatusDisplayErrorMessage = strDateTime +"  "+errorMessage;
 
         }
 
@@ -41374,7 +41423,7 @@ End Function
         /// 
         /// </summary>
         /// <param name="warningMessage"></param>
-        private static void WriteErrorsAndWarningsFile(string Message)
+        private static string WriteErrorsAndWarningsFile(string Message)
         {
             string pathFileName=string.Empty;
             string strTime=string.Empty;
@@ -41401,7 +41450,7 @@ End Function
             }
 
 
-            strTime = GetTimeStampStr();
+            strTime = GetTimeStampStr(0); //0===no ms in date time string
 
 
 
@@ -41413,10 +41462,11 @@ End Function
                     swError.WriteLine("{0}   {1}", strTime, Message);
                     swError.Close();
                 }
+                return strTime;
             }
             catch
             {
-
+                return String.Empty;
             }
             finally
             {
@@ -41441,57 +41491,10 @@ End Function
         /// <param name="warningMessage"></param>
         public static void WriteWarningFile(string warningMessage)
         {
-            string pathFileName;
-            string strTime;
+            string strDateTime;
 
-
-            DataContainer.StatusDisplayWarningMessage = warningMessage;
-
-            Logger.WriteErrorsAndWarningsFile(warningMessage);
-
-            //pathFileName = "C:\\temp\\WarningFile_" + Form1.DateTimeFromStartButtonWarningLog.ToString("MM_dd_yyyy__HH_mm_ss__") + Form1.fileNoForWarningLog.ToString() + ".txt";
-
-            //long length = 0;
-
-            //try
-            //{
-            //    length = new System.IO.FileInfo(pathFileName).Length;
-            //}
-            //catch (Exception)
-            //{
-            //    //this would call this routine which is invalid
-            //    //Logger.WriteErrorFile("Ex in get length of uC file.  Ex = " + Ex.ToString());
-            //}
-            //if (length > 50000000)
-            //{
-            //    Form1.fileNoForWarningLog += 1;
-            //    pathFileName = "C:\\temp\\WarningFile_" + Form1.DateTimeFromStartButtonWarningLog.ToString("MM_dd_yyyy__HH_mm_ss__") + Form1.fileNoForWarningLog.ToString() + ".txt";
-            //}
-
-
-            //strTime = GetTimeStampStr();
-
-            
-
-            //try
-            //{
-            //    _readWriteLock.EnterWriteLock();
-            //    using (StreamWriter swError = new StreamWriter(pathFileName, true))
-            //    {
-            //        swError.WriteLine("{0}   {1}", strTime, warningMessage);
-            //        swError.Close();
-            //    }
-            //}
-            //catch
-            //{
-
-            //}
-            //finally
-            //{
-            //    _readWriteLock.ExitWriteLock();
-            //}
-
-
+            strDateTime = Logger.WriteErrorsAndWarningsFile(warningMessage);
+            DataContainer.StatusDisplayWarningMessage = strDateTime + " " + warningMessage;
 
 
         }
@@ -41543,7 +41546,7 @@ End Function
             }
 
 
-            strTime = GetTimeStampStr();
+            strTime = GetTimeStampStr(1);
 
             try
             {
@@ -41598,7 +41601,7 @@ End Function
 
 
 
-            strTime = GetTimeStampStr();
+            strTime = GetTimeStampStr(1);
 
             try
             {
